@@ -1,33 +1,37 @@
+import logging
 import requests
-from datetime import datetime
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s | %(levelname)s | %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+
+logger = logging.getLogger(__name__)
 
 class HTTPStatusCodeError(Exception): 
     pass
 
-def custom_log(level, message):
-    time_now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    print(f"{time_now} | {level} | {message}")
-
 def make_request(code):
     url = f"https://httpstat.us/{code}"
     try:
-        custom_log("INFO", f"Отправка запроса на {url}")
+        logger.info(f"Send request to {url}")
         response = requests.get(url, headers={"Accept": "application/json"}, timeout=5)
-        recived_code = response.status_code
+        received_code = response.status_code
         
-        if 100 <= recived_code < 400:
-            custom_log("INFO", f"Статус-код: {recived_code} | Тело ответа: {response.text}")
+        if 100 <= received_code < 400:
+            logger.info(f"Status-code: {received_code} | Response body: {response.text}")
             
-        elif 400 <= recived_code < 600:
-            raise HTTPStatusCodeError(f"Код ошибки: {recived_code} | Тело ответа: {response.text}")
+        elif 400 <= received_code < 600:
+            raise HTTPStatusCodeError(f"Error-code: {received_code} | Response body: {response.text}")
             
     except HTTPStatusCodeError as e:
-        custom_log("ERROR", f"Исключение сервера: {e}")
+        logger.error(f"Service exception: {e}")
     except requests.exceptions.RequestException as e:
-        custom_log("ERROR", f"Сетевая ошибка: {e}")
+        logger.error(f"Network error: {e}")
 
 def main():
-    status_codes = [100, 200, 300, 404, 500]
+    status_codes = [200, 301, 404, 500]
     for code in status_codes:
         make_request(code)
 
