@@ -31,7 +31,7 @@ def make_request(code):
         logger.error(f"Network error: {e}")
 
 def main():
-    status_codes = [200, 301, 404, 500]
+    status_codes = [100, 200, 300, 404, 500]
     for code in status_codes:
         make_request(code)
 
